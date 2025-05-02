@@ -10,22 +10,24 @@ import javax.swing.ImageIcon;
  * @author Kamii
  */
 public class Pet extends SpriteMobile implements Runnable{
-    public static final int WIDTH = 40;
-    public static final int HEIGHT = 40;
+    public static final int WIDTH = 100;
+    public static final int HEIGHT = 100;
     
     protected long delay;
     private boolean running;
     private boolean paused;
     protected Thread thread;
-    //Se agrega el Forest  para poder perseguir a el velociraptor, saber donde esta  (su refrencia)
-    //No se hizo en Forest porque el movimiento del dinoDanger ocurre de forma independiente
+    private int targetX;
+    private int targetY;
+    //Se agrega el World  para poder perseguir a el mouse, saber donde esta  (su refrencia)
+    //No se hizo en World porque el movimiento del Qbert ocurre de forma independiente
     private World world;
     private Image QbertImage;
     public Pet(int x, int y, int height, int width) {
         super(x, y, height, width);
         
         QbertImage = new ImageIcon(getClass().getResource("/autonoma/pethilo/images/Qbert.png")).getImage();
-        setStep(3); // se mueve 3 pixeles por paso
+        setStep(30); // se mueve 3 pixeles por paso
         setDelay(100); // espera 1000 ms (1 segundo) entre pasos
         
         thread = new Thread(this);
@@ -45,45 +47,29 @@ public class Pet extends SpriteMobile implements Runnable{
     
     private boolean move()
     {
-        int direction = (int)(Math.random() * 4);
-        
-        int nx = x;
-        int ny = y;
-        
-        switch(direction)
-        {
-            case 0:     // UP
-                ny -= step;
-            break;
+        int dx = targetX - x;
+        int dy = targetY - y;
 
-            case 1:     // DOWN
-                ny += step;
-            break;
+        double distance = Math.sqrt(dx * dx + dy * dy);
 
-            case 2:     // LEFT
-                nx -= step;
-            break;
+        if (distance < step) return false;
 
-            case 3:     // RIGHT
-                nx += step;
-            break;
-            
-            default:
-                System.err.println("ERROR: Troll.move  Unknown direction.");
-            break;
-        }
-        
-        if(!isOutOfGraphicContainer(nx, ny, width, height))
-        {
+        double dirX = dx / distance;
+        double dirY = dy / distance;
+
+        int nx = x + (int)(dirX * step);
+        int ny = y + (int)(dirY * step);
+
+        if (!isOutOfGraphicContainer(nx, ny, width, height)) {
             x = nx;
             y = ny;
 
-            if(gameContainer != null)
+            if (gameContainer != null)
                 gameContainer.refresh();
-            
+
             return true;
         }
-        
+
         return false;
     }
     
@@ -97,7 +83,7 @@ public class Pet extends SpriteMobile implements Runnable{
             } catch (InterruptedException ex) {}
 
             if (isPaused()) continue;
-
+            move();
 
         }
     }
@@ -134,7 +120,12 @@ public class Pet extends SpriteMobile implements Runnable{
     public int getStep(){
         return step;
     }
-    public void setForest(World world) {
+    public void setWorld(World world) {
         this.world = world;
+    }
+    //Para que la mascota sepa a donde es que debe seguir el cursor
+    public void setTarget(int x, int y) {
+        this.targetX = x;
+        this.targetY = y;
     }
 }

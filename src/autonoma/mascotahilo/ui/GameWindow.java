@@ -1,11 +1,17 @@
 package autonoma.mascotahilo.ui;
 
+import autonoma.mascotahilo.elements.Pet;
+import autonoma.mascotahilo.elements.World;
+import gamebase.elements.GraphicContainer;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+
 /**
  *
  * @author Kamii
  */
-public class GameWindow extends javax.swing.JFrame {
-
+public class GameWindow extends javax.swing.JFrame implements GraphicContainer{
+    private World world;
     /**
      * Creates new form GameWindow
      */
@@ -44,10 +50,28 @@ public class GameWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseMoved
-        // TODO add your handling code here:
+        world.getPet().setTarget(evt.getX(), evt.getY());
     }//GEN-LAST:event_formMouseMoved
+    public void setWorld(World world) {
+        this.world = world;
+    }
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g); 
+    
+        if(world != null)
+            world.paint(g);
+    }
 
+    @Override
+    public void refresh() {
+        this.repaint();
+    }
 
+    @Override
+    public Rectangle getBoundaries() {
+        return this.getBounds();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
